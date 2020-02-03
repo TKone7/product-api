@@ -6,8 +6,10 @@ from app.models import Product
 from app import db
 from app.api.errors import bad_request
 from flask import url_for
+from app.api.auth import token_auth
 
 @bp.route('/products', methods=['GET'])
+@token_auth.login_required
 def get_products():
     page = request.args.get('page',1, type=int)
     per_page = min(request.args.get('per_page',5,type=int), 100)
@@ -15,10 +17,12 @@ def get_products():
     return jsonify(data)
 
 @bp.route('/products/<int:id>', methods=['GET'])
+@token_auth.login_required
 def get_product(id):
     return jsonify(Product.query.get_or_404(id).to_dict())
 
 @bp.route('/products', methods=['POST'])
+@token_auth.login_required
 def create_products():
     data = request.get_json() or {}
     print(data)
@@ -37,5 +41,6 @@ def create_products():
     return response
 
 @bp.route('/products/<int:id>', methods=['PUT'])
+@token_auth.login_required
 def update_products(id):
     pass
