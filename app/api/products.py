@@ -16,11 +16,16 @@ def get_products():
     data = Product.to_collection_dict(Product.query, page, per_page, 'api.get_products')
     return jsonify(data)
 
-@bp.route('/products/<string:barcode>', methods=['GET'])
+@bp.route('/products/barcode/<string:barcode>', methods=['GET'])
 @token_auth.login_required
-def get_product(barcode):
-    result = Product.query.filter_by(barcode=barcode).first()
-    return jsonify(result.to_dict()) if result else  error_response(404)
+def get_product_by_barcode(barcode):
+    product = Product.query.filter_by(barcode=barcode).first()
+    return jsonify(product.to_dict()) if product else error_response(404)
+
+@bp.route('/products/<int:id>', methods=['GET'])
+@token_auth.login_required
+def get_product(id):
+    return jsonify(Product.query.get_or_404(id).to_dict())
 
 @bp.route('/products', methods=['POST'])
 @token_auth.login_required
@@ -40,15 +45,13 @@ def create_products():
     db.session.commit()
     response = jsonify(product.to_dict())
     response.status_code = 201
-    response.headers['Location'] = url_for('api.get_product', barcode=product.barcode)
+    response.headers['Location'] = url_for('api.get_product', id=product.id)
     return response
 
-@bp.route('/products/<string:barcode>', methods=['PUT'])
+@bp.route('/products/<int:id>', methods=['PUT'])
 @token_auth.login_required
-def update_products(barcode):
-    product = Product.query.filter_by(barcode=barcode).first()
-    if not product:
-        return error_response(404)
+def update_products(id):
+    product = Product.query.get_or_404(id)
 
     data = request.get_json() or {}
     if 'qty_type' in data and data['qty_type'] not in QuantityType.__members__:
