@@ -3,6 +3,12 @@ from app import db
 from flask import url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
+from enum import Enum
+
+class QuantityType(Enum):
+    gramm = 1
+    milliliter = 2
+    pieces = 3
 
 class PaginatedAPIMixin(object):
     @staticmethod
@@ -67,7 +73,10 @@ class User(db.Model):
 class Product(PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
-    short_description = db.Column(db.String(256))
+    description = db.Column(db.String(256))
+    barcode = db.Column(db.String(32), index=True, unique=True)
+    qty_type = db.Column(db.Enum(QuantityType))
+    qty = db.Column(db.Integer)
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
@@ -77,12 +86,20 @@ class Product(PaginatedAPIMixin, db.Model):
         data = {
             'id': self.id,
             'name': self.name,
-            'description': self.short_description,
-            'creator':self.creator.username
+            'description': self.description,
+            'barcode': self.barcode,
+            'creator': self.creator.username,
+            'qty': self.qty
         }
+        if self.qty_type:
+            data['qty_type'] = self.qty_type.name
+
         return data
 
-    def from_dict(self, data):
-        for field in ['name', 'description']:
+    def from_dict(self, data, is_new = False):
+        if is_new:
+            setattr(self, 'barcode', data['barcode'])
+
+        for field in ['name', 'description', 'qty','qty_type']:
             if field in data:
                 setattr(self, field, data[field])
