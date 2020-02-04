@@ -1,6 +1,6 @@
 import base64, os
 from app import db
-from flask import url_for
+from flask import url_for, g, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from enum import Enum
@@ -9,6 +9,10 @@ class QuantityType(Enum):
     gramm = 1
     milliliter = 2
     pieces = 3
+
+class NutrientBase(Enum):
+    hundred_gramm = 1
+    hundred_milliliter = 2
 
 class PaginatedAPIMixin(object):
     @staticmethod
@@ -79,6 +83,17 @@ class Product(PaginatedAPIMixin, db.Model):
     qty = db.Column(db.Integer)
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+    nutrientbase = db.Column(db.Enum(NutrientBase))
+    energy_kcal = db.Column(db.Integer)
+    fat = db.Column(db.Float(precision=2))
+    fat_saturated = db.Column(db.Float(precision=2))
+    salt = db.Column(db.Float(precision=2))
+    protein = db.Column(db.Float(precision=2))
+    carbs = db.Column(db.Float(precision=2))
+    carbs_suger = db.Column(db.Float(precision=2))
+    fiber = db.Column(db.Float(precision=2))
+    natrium = db.Column(db.Float(precision=2))
+
     def __repr__(self):
         return '<Product {}>'.format(self.name)
 
@@ -91,15 +106,59 @@ class Product(PaginatedAPIMixin, db.Model):
             'creator': self.creator.username,
             'qty': self.qty
         }
+        nutrient_data = {
+            'energy_kcal': self.energy_kcal,
+            'fat':self.fat,
+            'fat_saturated':self.fat_saturated,
+            'salt':self.salt,
+            'protein':self.protein,
+            'carbs':self.carbs,
+            'carbs_suger':self.carbs_suger,
+            'fiber':self.fiber,
+            'natrium':self.natrium
+        }
         if self.qty_type:
             data['qty_type'] = self.qty_type.name
+        if self.nutrientbase:
+            nutrient_data['nutrientbase'] = self.nutrientbase.name
+            data['nutrient'] = nutrient_data
 
         return data
 
     def from_dict(self, data, is_new = False):
+        # Checks checks done when new product is submitted
         if is_new:
-            setattr(self, 'barcode', data['barcode'])
+            if 'name' not in data or 'barcode' not in data:
+                abort(400, description='name and barcode are mandatory')
+            if 'barcode' in data and Product.query.filter_by(barcode=data['barcode']).first():
+                abort(400, description='barcode is already existent')
+            self.creator = g.current_user
+            self.barcode = data['barcode']
 
-        for field in ['name', 'description', 'qty','qty_type']:
+        # General checks
+        if 'qty_type' in data and data['qty_type'] not in QuantityType.__members__:
+            abort(400, description='this QuantityType is invalid')
+
+        if 'nutrient' in data and 'nutrientbase' in data['nutrient'] and data['nutrient']['nutrientbase'] not in NutrientBase.__members__:
+            abort(400, description='this NutrientBase is invalid')
+
+        for field in ['name',
+        'description',
+        'qty',
+        'qty_type']:
             if field in data:
                 setattr(self, field, data[field])
+
+        if 'nutrient' in data:
+            for field in ['nutrientbase',
+            'energy_kcal',
+            'fat',
+            'fat_saturated',
+            'salt',
+            'protein',
+            'carbs',
+            'carbs_suger',
+            'fiber',
+            'natrium']:
+                if field in data['nutrient']:
+                    setattr(self, field, data['nutrient'][field])

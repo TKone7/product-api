@@ -1,0 +1,14 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }} - ProductAPI</title>
+      {% else %}
+      <title>Welcome to ProductAPI</title>
+      {% endif %}
+    </head>
+    <body>
+        <div>ProductAPI: <a href="/index">Home</a></div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>

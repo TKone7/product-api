@@ -1,7 +1,10 @@
+import logging
 from flask import Flask
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from logging.handlers import RotatingFileHandler
+import os
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -22,6 +25,19 @@ def create_app(config_class=Config):
 
     from app.errors import bp as error_bp
     application.register_blueprint(error_bp)
+
+    if not application.debug:
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+        file_handler = RotatingFileHandler('logs/productapi.log', maxBytes=10240,
+                                           backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+        file_handler.setLevel(logging.INFO)
+        application.logger.addHandler(file_handler)
+
+        application.logger.setLevel(logging.INFO)
+        application.logger.info('API startup')
 
     return application
 
