@@ -151,7 +151,9 @@ class Product(PaginatedAPIMixin, db.Model):
                 setattr(self, field, data[field])
 
         if 'nutrient' in data:
-            for field in ['nutrientbase',
+            self.nutrientbase = data['nutrient']['nutrientbase']
+
+            for field in [
             'energy_kcal',
             'fat',
             'fat_saturated',
@@ -162,4 +164,4 @@ class Product(PaginatedAPIMixin, db.Model):
             'fiber',
             'natrium']:
                 if field in data['nutrient']:
-                    setattr(self, field, data['nutrient'][field])
+                    setattr(self, field, float(data['nutrient'][field]) if data['nutrient'][field]!='' else None )
