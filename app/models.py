@@ -126,6 +126,7 @@ class Product(PaginatedAPIMixin, db.Model):
         return data
 
     def from_dict(self, data, is_new = False):
+        print(data)
         # Checks checks done when new product is submitted
         if is_new:
             if 'name' not in data or 'barcode' not in data:
