@@ -1,8 +1,8 @@
 from app import create_app, db
-from app.models import User, Product
+from app.models import User, Product, RevokedTokenModel
 
 app = create_app()
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'User': User, 'Product': Product}
+    return {'db': db, 'User': User, 'Product': Product, 'Revoked': RevokedTokenModel}

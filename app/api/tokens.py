@@ -1,9 +1,10 @@
 from flask import jsonify, g
-from app import db
+from app import db, jwt
 from app.api import bp
 from app.api.auth import basic_auth
+from app.models import User, RevokedTokenModel
 # from app.api.auth import token_auth
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_refresh_token_required
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_refresh_token_required, jwt_required, get_raw_jwt
 
 
 # @bp.route('/tokens', methods=['POST'])
@@ -27,6 +28,35 @@ def get_refreshtoken():
     id = get_jwt_identity()
     access_token = create_access_token(identity=id, fresh=False)
     return jsonify(token = access_token)
+
+@bp.route('/jwt-token', methods=['DELETE'])
+@jwt_required
+def delete_jwttoken():
+    jti = get_raw_jwt()['jti']
+    revoked_token = RevokedTokenModel(jti = jti)
+    revoked_token.add()
+    return '', 204
+
+@bp.route('/refresh-token', methods=['DELETE'])
+@jwt_refresh_token_required
+def delete_refreshtoken():
+    jti = get_raw_jwt()['jti']
+    revoked_token = RevokedTokenModel(jti = jti)
+    revoked_token.add()
+    return '', 204
+
+@jwt.user_claims_loader
+def add_name_to_access_token(identity):
+    user = User.check_jwt(identity)
+    if user:
+        return {
+            'name': user.username
+        }
+
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    return RevokedTokenModel.is_jti_blacklisted(jti)
 
 # @bp.route('/tokens', methods=['DELETE'])
 # @token_auth.login_required

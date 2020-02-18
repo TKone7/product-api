@@ -3,7 +3,8 @@ from flask import request,jsonify,url_for
 from app.models import Product
 from app import db
 from app.api.errors import error_response
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_raw_jwt
+import time
 # from app.api.auth import token_auth
 
 @bp.route('/products', methods=['GET'])
@@ -46,3 +47,11 @@ def update_products(id):
     product.from_dict(data)
     db.session.commit()
     return jsonify(product.to_dict())
+
+@bp.route('/dummy', methods=['GET'])
+@jwt_required
+def get_dummy():
+    data = {
+        'msg': 'You are authenticated and get some data. Your token expires in ' + str(get_raw_jwt()['exp'] - int(time.time())) + ' seconds'
+    }
+    return jsonify(data)

@@ -43,8 +43,8 @@ class User(db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     products = db.relationship('Product', backref='creator', lazy='dynamic')
-    token = db.Column(db.String(32), index=True, unique=True)
-    token_expiration = db.Column(db.DateTime)
+    # token = db.Column(db.String(32), index=True, unique=True)
+    # token_expiration = db.Column(db.DateTime)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -53,14 +53,28 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     @staticmethod
-    def check_token(token):
-        user = User.query.filter_by(token=token).first()
-        if user is None or user.token_expiration < datetime.utcnow():
+    def check_jwt(identity):
+        user = User.query.filter_by(id=identity).first()
+        if user is None:
             return None
         return user
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+class RevokedTokenModel(db.Model):
+    __tablename__ = 'revoked_tokens'
+    id = db.Column(db.Integer, primary_key = True)
+    jti = db.Column(db.String(120))
+
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def is_jti_blacklisted(cls, jti):
+        query = cls.query.filter_by(jti = jti).first()
+        return bool(query)
 
 class Product(PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
