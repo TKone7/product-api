@@ -5,11 +5,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from logging.handlers import RotatingFileHandler
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 import os
 
 db = SQLAlchemy()
 migrate = Migrate()
 cors = CORS()
+jwt = JWTManager()
 
 def create_app(config_class=Config):
     application = Flask(__name__)
@@ -18,6 +20,7 @@ def create_app(config_class=Config):
     db.init_app(application)
     migrate.init_app(application, db)
     cors.init_app(application)
+    jwt.init_app(application)
 
     from app.api import bp as api_bp
     application.register_blueprint(api_bp, url_prefix='/api')
