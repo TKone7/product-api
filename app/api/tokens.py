@@ -17,16 +17,16 @@ from flask_jwt_extended import create_access_token, create_refresh_token, get_jw
 @bp.route('/jwt-token', methods=['POST'])
 @basic_auth.login_required
 def get_jwttoken():
-    user_id = g.current_user.id
-    access_token = create_access_token(identity=user_id, fresh=True)
-    refresh_token = create_refresh_token(identity=user_id)
+    access_token = create_access_token(identity=g.current_user, fresh=True)
+    refresh_token = create_refresh_token(identity=g.current_user)
     return jsonify(token = access_token, refresh_token = refresh_token)
 
 @bp.route('/refresh-token', methods=['POST'])
 @jwt_refresh_token_required
 def get_refreshtoken():
     id = get_jwt_identity()
-    access_token = create_access_token(identity=id, fresh=False)
+    user = User.query.filter_by(id=id).first()
+    access_token = create_access_token(identity=user, fresh=False)
     return jsonify(token = access_token)
 
 @bp.route('/jwt-token', methods=['DELETE'])
@@ -45,13 +45,16 @@ def delete_refreshtoken():
     revoked_token.add()
     return '', 204
 
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    return user.id
+
 @jwt.user_claims_loader
 def add_name_to_access_token(identity):
-    user = User.check_jwt(identity)
-    if user:
-        return {
-            'name': user.username
-        }
+    return {
+        'name': identity.displayname,
+        'isAdmin': identity.isadmin or False
+    }
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):

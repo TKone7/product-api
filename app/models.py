@@ -40,9 +40,11 @@ class PaginatedAPIMixin(object):
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
+    displayname = db.Column(db.String(120))
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     products = db.relationship('Product', backref='creator', lazy='dynamic')
+    isadmin = db.Column(db.Boolean)
     # token = db.Column(db.String(32), index=True, unique=True)
     # token_expiration = db.Column(db.DateTime)
 
@@ -51,13 +53,6 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
-    @staticmethod
-    def check_jwt(identity):
-        user = User.query.filter_by(id=identity).first()
-        if user is None:
-            return None
-        return user
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -92,7 +87,7 @@ class Product(PaginatedAPIMixin, db.Model):
     salt = db.Column(db.Float(precision=2))
     protein = db.Column(db.Float(precision=2))
     carbs = db.Column(db.Float(precision=2))
-    carbs_suger = db.Column(db.Float(precision=2))
+    carbs_sugar = db.Column(db.Float(precision=2))
     fiber = db.Column(db.Float(precision=2))
     natrium = db.Column(db.Float(precision=2))
 
@@ -115,7 +110,7 @@ class Product(PaginatedAPIMixin, db.Model):
             'salt':self.salt,
             'protein':self.protein,
             'carbs':self.carbs,
-            'carbs_suger':self.carbs_suger,
+            'carbs_sugar':self.carbs_sugar,
             'fiber':self.fiber,
             'natrium':self.natrium
         }
@@ -162,7 +157,7 @@ class Product(PaginatedAPIMixin, db.Model):
             'salt',
             'protein',
             'carbs',
-            'carbs_suger',
+            'carbs_sugar',
             'fiber',
             'natrium']:
                 if field in data['nutrient']:
