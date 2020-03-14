@@ -1,9 +1,13 @@
 import base64, os
 from app import db
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 from flask import url_for, g, abort
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+from datetime import date
 from enum import Enum
+from flask_jwt_extended import get_jwt_identity
+
 
 class QuantityType(Enum):
     gramm = 1
@@ -39,11 +43,15 @@ class PaginatedAPIMixin(object):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(UUID(as_uuid=True), default=uuid.uuid4)
+
     username = db.Column(db.String(64), index=True, unique=True)
     displayname = db.Column(db.String(120))
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     products = db.relationship('Product', backref='creator', lazy='dynamic')
+    fridges = db.relationship('Fridge', secondary='userfridge', backref='owners', lazy='dynamic')
+
     isadmin = db.Column(db.Boolean)
     # token = db.Column(db.String(32), index=True, unique=True)
     # token_expiration = db.Column(db.DateTime)
@@ -56,6 +64,22 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+    def to_dict(self):
+        data = {
+            'id': self.uuid,
+            'username': self.username,
+            'displayname': self.displayname,
+            'email': self.email,
+            'isadmin': self.isadmin,
+        }
+        return data
+
+    @classmethod
+    def fromJwt(cls):
+        uuid = get_jwt_identity()
+        user =  User.query.filter_by(uuid=uuid).first()
+        return user
 
 class RevokedTokenModel(db.Model):
     __tablename__ = 'revoked_tokens'
@@ -73,12 +97,19 @@ class RevokedTokenModel(db.Model):
 
 class Product(PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(UUID(as_uuid=True), default=uuid.uuid4)
+
     name = db.Column(db.String(128), index=True)
     description = db.Column(db.String(256))
     barcode = db.Column(db.String(32), index=True, unique=True)
     qty_type = db.Column(db.Enum(QuantityType))
     qty = db.Column(db.Integer)
+    imgurl = db.Column(db.String(128))
+
+    # relations
+    items = db.relationship('Item', backref='product', lazy='dynamic')
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
     nutrientbase = db.Column(db.Enum(NutrientBase))
     energy_kcal = db.Column(db.Integer)
@@ -96,12 +127,14 @@ class Product(PaginatedAPIMixin, db.Model):
 
     def to_dict(self):
         data = {
-            'id': self.id,
+            'id': self.uuid,
             'name': self.name,
             'description': self.description,
             'barcode': self.barcode,
             'creator': self.creator.username,
-            'qty': self.qty
+            'qty': self.qty,
+            'imgurl': self.imgurl,
+            'category': self.category.slug if self.category else None
         }
         nutrient_data = {
             'energy_kcal': self.energy_kcal,
@@ -123,14 +156,12 @@ class Product(PaginatedAPIMixin, db.Model):
         return data
 
     def from_dict(self, data, is_new = False):
-        print(data)
         # Checks checks done when new product is submitted
         if is_new:
             if 'name' not in data or 'barcode' not in data:
-                abort(400, description='name and barcode are mandatory')
+                abort(400, description='name and barcode are mandatory, receive ' + str(data))
             if 'barcode' in data and Product.query.filter_by(barcode=data['barcode']).first():
                 abort(400, description='barcode is already existent')
-            self.creator = g.current_user
             self.barcode = data['barcode']
 
         # General checks
@@ -140,10 +171,14 @@ class Product(PaginatedAPIMixin, db.Model):
         if 'nutrient' in data and 'nutrientbase' in data['nutrient'] and data['nutrient']['nutrientbase'] not in NutrientBase.__members__:
             abort(400, description='this NutrientBase is invalid')
 
+        if 'category' in data:
+            self.category = Category.query.filter_by(slug=data['category']).first()
+
         for field in ['name',
         'description',
         'qty',
-        'qty_type']:
+        'qty_type',
+        'imgurl']:
             if field in data:
                 setattr(self, field, data[field])
 
@@ -161,4 +196,83 @@ class Product(PaginatedAPIMixin, db.Model):
             'fiber',
             'natrium']:
                 if field in data['nutrient']:
-                    setattr(self, field, float(data['nutrient'][field]) if data['nutrient'][field]!='' else None )
+                    setattr(self, field, float(data['nutrient'][field]) if data['nutrient'][field] else None )
+                else:
+                    setattr(self, field, None)
+        else:
+            self.nutrientbase = None
+            self.energy_kcal = None
+            self.fat = None
+            self.fat_saturated = None
+            self.salt = None
+            self.protein = None
+            self.carbs = None
+            self.carbs_sugar = None
+            self.fiber = None
+            self.natrium = None
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    slug = db.Column(db.String(128), index=True, unique=True)
+    name = db.Column(db.String(128))
+    products = db.relationship('Product', backref='category', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Category {}>'.format(self.slug)
+
+    def to_dict(self):
+        data = {
+            'name': self.name,
+            'slug': self.slug
+        }
+        return data
+
+    def from_dict(self, data):
+        pass
+
+class UserFridge(db.Model):
+    __tablename__ = 'userfridge'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key = True)
+    fridge_id = db.Column(db.Integer, db.ForeignKey('fridge.id'), primary_key = True)
+
+class Fridge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(UUID(as_uuid=True), default=uuid.uuid4)
+    name = db.Column(db.String(64))
+
+    # relations
+    items = db.relationship('Item', backref='fridge', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Fridge {}>'.format(self.uuid)
+
+    def to_dict(self):
+        # @todo send resource to user url_for('api.get_user', uuid=user.uuid)
+        owners = [owner.username for owner in self.owners]
+        data = {
+            'id': self.uuid,
+            'name': self.name,
+            'owner': owners
+        }
+        return data
+
+    def from_dict(self, data, is_new = False):
+        if is_new:
+            if 'name' not in data:
+                abort(400, description='name is mandatory, receive ' + str(data))
+            self.name = data['name']
+
+class Item(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(UUID(as_uuid=True), default=uuid.uuid4)
+    created = db.Column(db.Date, default=date.today())
+    expiry = db.Column(db.Date)
+
+    fridge_id = db.Column(db.Integer, db.ForeignKey('fridge.id'))
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
+
+    qty = db.Column(db.Float(precision=2))
+
+    def __repr__(self):
+        return '<Item of {} qty {} in {}>'.format(self.product.name, self.qty, self.fridge.uuid)

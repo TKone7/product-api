@@ -17,17 +17,18 @@ from flask_jwt_extended import create_access_token, create_refresh_token, get_jw
 @bp.route('/jwt-token', methods=['POST'])
 @basic_auth.login_required
 def get_jwttoken():
-    access_token = create_access_token(identity=g.current_user, fresh=True)
-    refresh_token = create_refresh_token(identity=g.current_user)
-    return jsonify(token = access_token, refresh_token = refresh_token)
+    user = g.current_user
+    access_token = create_access_token(identity=user, fresh=True)
+    refresh_token = create_refresh_token(identity=user)
+    return jsonify(token = access_token, refresh_token = refresh_token, user = user.to_dict())
 
 @bp.route('/refresh-token', methods=['POST'])
 @jwt_refresh_token_required
 def get_refreshtoken():
-    id = get_jwt_identity()
-    user = User.query.filter_by(id=id).first()
+    uuid = get_jwt_identity()
+    user = User.query.filter_by(uuid=uuid).first()
     access_token = create_access_token(identity=user, fresh=False)
-    return jsonify(token = access_token)
+    return jsonify(token = access_token, user = user.to_dict())
 
 @bp.route('/jwt-token', methods=['DELETE'])
 @jwt_required
@@ -47,7 +48,7 @@ def delete_refreshtoken():
 
 @jwt.user_identity_loader
 def user_identity_lookup(user):
-    return user.id
+    return user.uuid
 
 @jwt.user_claims_loader
 def add_name_to_access_token(identity):
