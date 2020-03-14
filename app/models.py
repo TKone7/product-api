@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from flask import url_for, g, abort
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import date
+from datetime import date, datetime
 from enum import Enum
 from flask_jwt_extended import get_jwt_identity
 
@@ -174,11 +174,7 @@ class Product(PaginatedAPIMixin, db.Model):
         if 'category' in data:
             self.category = Category.query.filter_by(slug=data['category']).first()
 
-        for field in ['name',
-        'description',
-        'qty',
-        'qty_type',
-        'imgurl']:
+        for field in ['name', 'description', 'qty', 'qty_type', 'imgurl']:
             if field in data:
                 setattr(self, field, data[field])
 
@@ -262,6 +258,10 @@ class Fridge(db.Model):
             if 'name' not in data:
                 abort(400, description='name is mandatory, receive ' + str(data))
             self.name = data['name']
+            user = User.fromJwt()
+            self.owners.append(user)
+        else:
+            abort(400, description='update of an existing Fridge is not yet implemented')
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -273,6 +273,37 @@ class Item(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
 
     qty = db.Column(db.Float(precision=2))
+
+    def to_dict(self):
+        # @todo send resource to fridge, product, url_for('api.***', uuid=user.uuid)
+        data = {
+            'id': self.uuid,
+            'fridge': self.fridge.uuid,
+            'product': self.product.uuid,
+            'created': self.created.strftime('%Y-%m-%d'),
+            'expiry': self.expiry.strftime('%Y-%m-%d') if self.expiry else None,
+            'qty': self.qty
+        }
+        return data
+
+    def from_dict(self, data, is_new = False,):
+        if not self.id and 'created' in data:
+            abort(400, description='created is not allowed for new items, receive ' + str(data))
+
+        if is_new:
+            if 'product' not in data or 'qty' not in data:
+                abort(400, description='product reference or qty is missing, receive ' + str(data))
+            self.created = date.today()
+            self.product = Product.query.filter_by(uuid=data['product']).first()
+
+        if 'qty' in data: 
+            self.qty = data['qty']
+
+        if 'expiry' in data:
+            if data['expiry']:
+                self.expiry = datetime.strptime(data['expiry'], '%Y-%m-%d').date()
+            else:
+                self.expiry = None
 
     def __repr__(self):
         return '<Item of {} qty {} in {}>'.format(self.product.name, self.qty, self.fridge.uuid)
