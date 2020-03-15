@@ -1,0 +1,35 @@
+<div  class="card" *ngIf="product.name">
+    
+    <div *ngIf="showActions" class="card-header">
+        <div class="row">
+            <div class="col-2">
+                <button (click)="editCard()" type="button" class="btn btn-outline-secondary" style="text-align: left;">Edit</button>
+            </div>
+            <div class="col">
+                <h5 class="card-title">{{ product.name }}</h5>
+            </div>
+            <div class="col-2">
+                <button *ngIf="showActions" type="button" class="close" aria-label="Close" (click)="closeCard()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <img [src]="product.imgurl" class="card-img-top" *ngIf="product.imgurl" style="max-width: 250px;">
+    <div class="card-body">
+        <p class="card-text">{{ product.barcode }}</p>
+        <p class="card-text">{{ product.description }}</p>
+        <p class="card-text">{{ product.qty }} {{ product.qty_type }}</p>
+    </div>
+    <div *ngIf="showActions" class="card-footer">
+        <div class="row">
+            <div class="col">
+                <button 
+                    (click)="addToCart(product)"
+                    class="btn btn-primary btn-block">Add to Fridge
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

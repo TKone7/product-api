@@ -1,0 +1,75 @@
+<div [formGroup]="mainForm">
+    <div class="form-group">
+        <label for="productname">Title</label>
+        <input  
+            formControlName="name"            
+            id="productname" type="text"
+            class="form-control">
+        <div *ngIf="name.touched && name.invalid" class="alert alert-danger">
+            Product name is required
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <input  
+            formControlName="description" 
+            id="description" type="text" class="form-control">
+    </div>
+    <div class="form-group">
+        <label for="barcode">Barcode</label>
+        <input 
+            formControlName="barcode"
+            id="barcode" type="text" class="form-control">
+        <div *ngIf="barcode.touched && barcode.invalid" class="alert alert-danger">
+            <div *ngIf="barcode.errors?.required">Barcode is required</div>
+            <div *ngIf="barcode.errors?.number">Barcode must be a number</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="qty">Quantity</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <select 
+                    formControlName="qty_type"
+                    id="qty_type"
+                    class="form-control">
+                    <option *ngFor="let type of types" [value]="type">{{type}}</option>
+                </select>
+            </div>
+            <input 
+                formControlName="qty"
+                id="qty"
+                type="number"
+                class="form-control"
+                >
+        </div>
+        <div *ngIf="qty.touched && qty.invalid" class="alert alert-danger">
+            <div *ngIf="qty.errors.required">Quantity is required</div>
+            <div *ngIf="qty.errors.min">Quantity should be zero or higher</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="category">Category</label>
+        <select
+            formControlName="category"
+            id="category" 
+            class="form-control">
+            <option value="">Please select category</option>
+            <option *ngFor="let c of categories$ | async" [value]="c.slug">{{ c.name }}</option>
+        </select>
+        <div *ngIf="category.touched && category.invalid" class="alert alert-danger">
+            Category is required
+        </div>
+    </div> 
+    <div class="form-group">
+        <label for="imageUrl">Image URL</label>
+        <input 
+            formControlName="imgurl"
+            id="imageUrl"
+            type="text"
+            class="form-control">
+        <div *ngIf="imageUrl.touched && imageUrl.invalid" class="alert alert-danger">
+            <div *ngIf="imageUrl.errors.url">Please enter valid URL</div>
+        </div>
+    </div> 
+</div>

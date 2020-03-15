@@ -1,0 +1,30 @@
+
+<div class="row justify-content-start" >
+    <div class="col" style="padding:1.5rem;margin:1rem -15px 0">
+        <ul class="nav nav-tabs nav-justified" >
+            <li class="nav-item">
+            <a class="nav-link" [ngClass]="{ 'active':activeTab==='main'}" (click)="activate('main')">Basic Data</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [ngClass]="{ 'active':activeTab==='nutrient'}" (click)="activate('nutrient')">Nutrient</a>
+            </li>           
+        </ul>
+    </div>
+</div>
+
+<form  [formGroup]="form" (ngSubmit)="save()">
+    <div class="row">
+        <div class="col-md-6">
+            <product-main [main-form]="form" *ngIf="activeTab==='main'"></product-main>
+            <product-nutrient (toggled)="onToggled($event)" [nutrient-form]="form.get('nutrient')" *ngIf="activeTab==='nutrient'"></product-nutrient>
+        </div>
+        <div class="col-md-6">
+            <product-card [product]="form.getRawValue()" [show-actions]="false"></product-card>
+            <div>
+                <button class="btn btn-primary" [disabled]="form.invalid">Save</button>
+                <button (click)="delete()" type="button" class="btn btn-outline-danger" [disabled]="!existingBarcode">Delete</button>
+                <button (click)="back()" type="button" class="btn btn-light" role="button">Back</button>
+            </div>
+        </div>
+    </div>
+</form>
