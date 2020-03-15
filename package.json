@@ -9,13 +9,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "postinstall": "ng build --prod",
-    "build:client-and-server-bundles": "ng build --prod && ng run oshop:server:production",
-    "build:prerender": "npm run build:client-and-server-bundles && npm run webpack:server && npm run generate:prerender",
-    "build:ssr": "npm run build:client-and-server-bundles && npm run webpack:server",
-    "generate:prerender": "cd dist && node prerender",
-    "webpack:server": "webpack --config webpack.server.config.js --progress --colors",
-    "serve:prerender": "cd dist/browser && http-server --proxy http://localhost:5000",
-    "serve:ssr": "node dist/server"
+
   },
   "private": true,
   "dependencies": {
@@ -34,18 +28,14 @@
     "@angular/router": "~8.2.14",
     "@auth0/angular-jwt": "^4.0.0",
     "@ng-bootstrap/ng-bootstrap": "^5.3.0",
-    "@nguniversal/express-engine": "^8.2.6",
-    "@nguniversal/module-map-ngfactory-loader": "^8.2.6",
     "@zxing/ngx-scanner": "^3.0.0",
     "bootstrap": "^4.4.1",
     "express": "^4.17.1",
     "g": "^2.0.1",
-    "http-proxy-middleware": "^1.0.2",
     "ng2-validation": "^4.2.0",
     "ngx-barcode-scanner": "0.0.7",
     "quagga": "^0.12.1",
     "rxjs": "~6.4.0",
-    "ts-loader": "^6.2.1",
     "tslib": "^1.10.0",
     "typescript": "~3.5.3",
     "zone.js": "~0.9.1"
