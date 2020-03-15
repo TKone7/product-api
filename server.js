@@ -9,7 +9,7 @@ const options = {
     //   '^/api/remove/path': '/path' // remove base path
     // }
   };
-  
+
 
 app.use(express.static(__dirname + '/dist/oshop'));
 
@@ -21,5 +21,4 @@ app.get('/*', (req,res) => {
     res.sendFile(__dirname + '/dist/oshop/index.html');
 });
 
-// app.listen(process.env.PORT || 8080);
-app.listen(4200);
+app.listen(process.env.PORT || 8080);

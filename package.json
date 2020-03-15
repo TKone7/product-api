@@ -32,6 +32,7 @@
     "core-js": "^3.6.4",
     "express": "^4.17.1",
     "g": "^2.0.1",
+    "http-proxy-middleware": "^1.0.2",
     "ng2-validation": "^4.2.0",
     "ngx-barcode-scanner": "0.0.7",
     "quagga": "^0.12.1",
