@@ -5,7 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { Location } from '@angular/common';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { CustomValidators } from 'ng2-validation';
+// import { CustomValidators } from 'ng2-validation';
 
 
 @Component({
@@ -17,11 +17,11 @@ export class ProductFormComponent implements OnInit {
   form = new FormGroup({
     name: new FormControl('', Validators.required),
     description: new FormControl(),
-    barcode: new FormControl('', [Validators.required, CustomValidators.number]),
+    barcode: new FormControl('', [Validators.required]),
     'qty_type': new FormControl(),
     qty: new FormControl('', [Validators.required, Validators.min(0)]),
     category: new FormControl('', Validators.required),
-    imgurl: new FormControl('', CustomValidators.url)
+    imgurl: new FormControl('')
   });
   nutritionForm = new FormGroup({
     carbs: new FormControl(),
