@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const path = require('path');
 
 const options = {
     target: 'http://127.0.0.1:5000', // target host
