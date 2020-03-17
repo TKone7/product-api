@@ -27,3 +27,4 @@ wheels/
 
 *.bsdesign
 set_env
+node_modules
