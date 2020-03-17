@@ -22,4 +22,4 @@ app.get('/*', (req,res) => {
     res.sendFile(__dirname + '/dist/oshop/index.html');
 });
 
-app.listen(8080);
+app.listen(process.env.PORT);
