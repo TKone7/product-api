@@ -14,7 +14,7 @@
   "dependencies": {
     "@angular/animations": "~8.2.14",
     "@angular/cdk": "~8.2.3",
-    "@angular/cli": "^9.0.6",
+    "@angular/cli": "^8.0.0",
     "@angular/common": "~8.2.14",
     "@angular/compiler": "~8.2.14",
     "@angular/compiler-cli": "~8.2.14",
@@ -59,7 +59,7 @@
     "tslint": "~5.15.0"
   },
   "engines": {
-    "node": "13.7.0",
-    "npm": "6.13.6"
+    "node": "13.10.1",
+    "npm": "6.14.2"
   }
 }
