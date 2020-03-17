@@ -24,7 +24,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RefreshTokenInterceptor } from './refresh-token-interceptor';
 import { ProductFormComponent } from './admin/product-form/product-form.component';
-import { CustomFormsModule } from 'ng2-validation';
+// import { CustomFormsModule } from 'ng2-validation';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
@@ -66,7 +66,6 @@ import { InventoryRecordComponent } from './fridge/inventory-record/inventory-re
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    CustomFormsModule,
     ZXingScannerModule,
     MatTableModule,
     MatPaginatorModule,
