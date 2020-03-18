@@ -1,1 +1,1 @@
-web: node server.js
+web: flask db upgrade; gunicorn productapi:app
