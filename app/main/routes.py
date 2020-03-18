@@ -6,8 +6,4 @@ from app.main import bp
 def index():
     print('test the path')
     user = {'username': 'Tobias'}
-    return send_from_directory('./main/', 'index.html', mimetype='text/html')
-
-@bp.route('/<path:path>', methods=['GET'])
-def static_proxy(path):
-    return send_from_directory('./main/', path, mimetype='application/javascript')
+    return render_template('index.html', title='Home', user=user)
