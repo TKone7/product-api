@@ -52,7 +52,7 @@ class User(db.Model):
     products = db.relationship('Product', backref='creator', lazy='dynamic')
     fridges = db.relationship('Fridge', secondary='userfridge', backref='owners', lazy='dynamic')
 
-    isadmin = db.Column(db.Boolean)
+    isadmin = db.Column(db.Boolean, default=False)
     # token = db.Column(db.String(32), index=True, unique=True)
     # token_expiration = db.Column(db.DateTime)
 
@@ -74,6 +74,13 @@ class User(db.Model):
             'isadmin': self.isadmin,
         }
         return data
+
+    def from_dict(self, data, new_user=False):
+        for field in ['username', 'email', 'displayname']:
+            if field in data:
+                setattr(self, field, data[field])
+        if new_user and 'password' in data:
+            self.set_password(data['password'])
 
     @classmethod
     def fromJwt(cls):
@@ -296,7 +303,7 @@ class Item(db.Model):
             self.created = date.today()
             self.product = Product.query.filter_by(uuid=data['product']).first()
 
-        if 'qty' in data: 
+        if 'qty' in data:
             self.qty = data['qty']
 
         if 'expiry' in data:
