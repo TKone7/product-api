@@ -127,7 +127,7 @@ class Product(PaginatedAPIMixin, db.Model):
     carbs = db.Column(db.Float(precision=2))
     carbs_sugar = db.Column(db.Float(precision=2))
     fiber = db.Column(db.Float(precision=2))
-    natrium = db.Column(db.Float(precision=2))
+    # natrium = db.Column(db.Float(precision=2))
 
     def __repr__(self):
         return '<Product {}>'.format(self.name)
@@ -151,8 +151,8 @@ class Product(PaginatedAPIMixin, db.Model):
             'protein':self.protein,
             'carbs':self.carbs,
             'carbs_sugar':self.carbs_sugar,
-            'fiber':self.fiber,
-            'natrium':self.natrium
+            'fiber':self.fiber
+            # 'natrium':self.natrium
         }
         if self.qty_type:
             data['qty_type'] = self.qty_type.name
@@ -196,8 +196,7 @@ class Product(PaginatedAPIMixin, db.Model):
             'protein',
             'carbs',
             'carbs_sugar',
-            'fiber',
-            'natrium']:
+            'fiber']:
                 if field in data['nutrient']:
                     setattr(self, field, float(data['nutrient'][field]) if data['nutrient'][field] else None )
                 else:
@@ -212,7 +211,7 @@ class Product(PaginatedAPIMixin, db.Model):
             self.carbs = None
             self.carbs_sugar = None
             self.fiber = None
-            self.natrium = None
+            # self.natrium = None
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
