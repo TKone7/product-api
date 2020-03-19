@@ -7,7 +7,7 @@ from flask_jwt_extended import jwt_required, get_raw_jwt
 import time
 
 @bp.route('/users', methods=['HEAD'])
-def get_user():
+def check_user():
     username = request.args.get('username', default = None, type = str)
     email = request.args.get('email', default = None, type = str)
 
@@ -20,6 +20,21 @@ def get_user():
     status_code = 200 if user else 204
 
     return '', status_code
+
+@bp.route('/users', methods=['GET'])
+@jwt_required
+def get_user():
+    username = request.args.get('username', default = None, type = str)
+    email = request.args.get('email', default = None, type = str)
+
+    user_query = User.query
+    if username:
+        user_query = user_query.filter_by(username=username)
+    if email:
+        user_query = user_query.filter_by(email=email)
+    users = user_query.all()
+    data = [user.to_dict() for user in users]
+    return jsonify(data)
 
 @bp.route('/users', methods=['POST'])
 def create_user():
@@ -38,3 +53,12 @@ def create_user():
     response.status_code = 201
     # response.headers['Location'] = url_for('api.get_user', id=user.id)
     return response
+
+@bp.route('/users/<string:uuid>', methods=['PUT'])
+@jwt_required
+def update_users(uuid):
+    user = User.query.filter_by(uuid=uuid).first()
+    data = request.get_json() or {}
+    user.from_dict(data)
+    db.session.commit()
+    return jsonify(product.to_dict())

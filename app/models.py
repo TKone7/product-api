@@ -76,7 +76,7 @@ class User(db.Model):
         return data
 
     def from_dict(self, data, new_user=False):
-        for field in ['username', 'email', 'displayname']:
+        for field in ['username', 'email', 'displayname', 'isadmin']:
             if field in data:
                 setattr(self, field, data[field])
         if new_user and 'password' in data:
