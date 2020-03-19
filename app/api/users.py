@@ -61,4 +61,4 @@ def update_users(uuid):
     data = request.get_json() or {}
     user.from_dict(data)
     db.session.commit()
-    return jsonify(product.to_dict())
+    return jsonify(user.to_dict())
