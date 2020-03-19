@@ -8,7 +8,7 @@ import time
 from sqlalchemy import desc, asc
 
 @bp.route('/products', methods=['GET'])
-@jwt_required
+# @jwt_required
 def get_products():
     sort_by = request.args.get('sort_by', default = 'name.asc', type = str)
     sort_column, sort_dir = sort_by.split('.')

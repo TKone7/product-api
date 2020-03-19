@@ -7,7 +7,7 @@ from flask_jwt_extended import jwt_required, get_raw_jwt
 from sqlalchemy import desc, asc
 
 @bp.route('/categories', methods=['GET'])
-@jwt_required
+# @jwt_required
 def get_categories():
     sort_by = request.args.get('sort_by', default = 'slug.asc', type = str)
     sort_column, sort_dir = sort_by.split('.')
