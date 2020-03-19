@@ -6,6 +6,21 @@ from app.api.errors import error_response,bad_request
 from flask_jwt_extended import jwt_required, get_raw_jwt
 import time
 
+@bp.route('/users', methods=['HEAD'])
+def get_user():
+    username = request.args.get('username', default = None, type = str)
+    email = request.args.get('email', default = None, type = str)
+
+    user_query = User.query
+    if username:
+        user_query = user_query.filter_by(username=username)
+    if email:
+        user_query = user_query.filter_by(email=email)
+    user = user_query.first()
+    status_code = 200 if user else 204
+
+    return '', status_code
+
 @bp.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json() or {}

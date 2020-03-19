@@ -21,7 +21,7 @@ def get_products():
     return jsonify(data)
 
 @bp.route('/products/<string:barcode>', methods=['GET'])
-@jwt_required
+# @jwt_required
 def get_product_by_barcode(barcode):
     product = Product.query.filter_by(barcode=barcode).first()
     return jsonify(product.to_dict()) if product else error_response(404)
@@ -65,10 +65,10 @@ def delete_products(barcode):
     db.session.commit()
     return '', 204
 
-@bp.route('/dummy', methods=['GET'])
-@jwt_required
-def get_dummy():
-    data = {
-        'msg': 'You are authenticated and get some data. Your token expires in ' + str(get_raw_jwt()['exp'] - int(time.time())) + ' seconds'
-    }
-    return jsonify(data)
+# @bp.route('/dummy', methods=['GET'])
+# @jwt_required
+# def get_dummy():
+#     data = {
+#         'msg': 'You are authenticated and get some data. Your token expires in ' + str(get_raw_jwt()['exp'] - int(time.time())) + ' seconds'
+#     }
+#     return jsonify(data)
