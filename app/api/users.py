@@ -66,3 +66,14 @@ def update_users(uuid):
         user.isadmin = True
     db.session.commit()
     return jsonify(user.to_dict())
+
+@bp.route('/users/<string:uuid>', methods=['DELETE'])
+@jwt_required
+def delete_users(uuid):
+    user = User.query.filter_by(uuid=uuid).first()
+    if user.username == 'admin':
+        return '', 423
+
+    db.session.delete(user)
+    db.session.commit()
+    return '', 204
