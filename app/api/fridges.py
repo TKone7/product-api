@@ -65,7 +65,9 @@ def get_fridge_items(fridge_uuid):
     if not userHasAccess(fridge):
         return error_response(401)
 
-    items = [item.to_dict() for item in fridge.items]
+    product_filter = request.args.get('barcode', default = None, type = str)
+
+    items = [item.to_dict() for item in fridge.items if (not product_filter or item.product.barcode == product_filter)]
     return jsonify(items)
 
 @bp.route('/fridges/<string:fridge_uuid>/items/<string:item_uuid>', methods=['GET'])
