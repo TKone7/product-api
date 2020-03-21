@@ -251,7 +251,7 @@ class Fridge(db.Model):
 
     def to_dict(self):
         # @todo send resource to user url_for('api.get_user', uuid=user.uuid)
-        owners = [owner.username for owner in self.owners]
+        owners = [owner.displayname for owner in self.owners]
         data = {
             'id': self.uuid,
             'name': self.name,
@@ -285,7 +285,7 @@ class Item(db.Model):
         data = {
             'id': self.uuid,
             'fridge': self.fridge.uuid,
-            'product': self.product.uuid,
+            'barcode': self.product.barcode,
             'created': self.created.strftime('%Y-%m-%d'),
             'expiry': self.expiry.strftime('%Y-%m-%d') if self.expiry else None,
             'qty': self.qty
@@ -297,10 +297,10 @@ class Item(db.Model):
             abort(400, description='created is not allowed for new items, receive ' + str(data))
 
         if is_new:
-            if 'product' not in data or 'qty' not in data:
+            if 'barcode' not in data or 'qty' not in data:
                 abort(400, description='product reference or qty is missing, receive ' + str(data))
             self.created = date.today()
-            self.product = Product.query.filter_by(uuid=data['product']).first()
+            self.product = Product.query.filter_by(barcode=data['barcode']).first()
 
         if 'qty' in data:
             self.qty = data['qty']
