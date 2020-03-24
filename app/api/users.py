@@ -21,20 +21,24 @@ def check_user():
 
     return '', status_code
 
-# @bp.route('/users', methods=['GET'])
-# @jwt_required
-# def get_user():
-#     username = request.args.get('username', default = None, type = str)
-#     email = request.args.get('email', default = None, type = str)
-#
-#     user_query = User.query
-#     if username:
-#         user_query = user_query.filter_by(username=username)
-#     if email:
-#         user_query = user_query.filter_by(email=email)
-#     users = user_query.all()
-#     data = [user.to_dict() for user in users]
-#     return jsonify(data)
+@bp.route('/users', methods=['GET'])
+@jwt_required
+def get_user():
+    user = User.fromJwt()
+    if not user.isadmin:
+        return error_response(401)
+
+    username = request.args.get('username', default = None, type = str)
+    email = request.args.get('email', default = None, type = str)
+
+    user_query = User.query
+    if username:
+        user_query = user_query.filter_by(username=username)
+    if email:
+        user_query = user_query.filter_by(email=email)
+    users = user_query.all()
+    data = [user.to_dict() for user in users]
+    return jsonify(data)
 
 @bp.route('/users/email/<string:email>', methods=['GET'])
 @jwt_required
@@ -67,6 +71,10 @@ def create_user():
 @bp.route('/users/<string:uuid>', methods=['PUT'])
 @jwt_required
 def update_users(uuid):
+    activeuser = User.fromJwt()
+    if not activeuser.isadmin:
+        return error_response(401)
+
     user = User.query.filter_by(uuid=uuid).first()
 
     data = request.get_json() or {}
