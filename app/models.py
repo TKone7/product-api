@@ -51,6 +51,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128))
     products = db.relationship('Product', backref='creator', lazy='dynamic')
     fridges = db.relationship('Fridge', secondary='userfridge', backref='owners', lazy='dynamic')
+    createdfridges = db.relationship('Fridge', backref='creator', lazy='dynamic')
 
     isadmin = db.Column(db.Boolean, default=False)
     # token = db.Column(db.String(32), index=True, unique=True)
@@ -65,9 +66,11 @@ class User(db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
-    def to_dict(self):
+    def to_dict(self, public_only=False):
+        if public_only:
+            return {'uuid': self.uuid, 'displayname': self.displayname}
         data = {
-            'id': self.uuid,
+            'uuid': self.uuid,
             'username': self.username,
             'displayname': self.displayname,
             'email': self.email,
@@ -244,6 +247,7 @@ class Fridge(db.Model):
     name = db.Column(db.String(64))
 
     # relations
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     items = db.relationship('Item', backref='fridge', lazy='dynamic')
 
     def __repr__(self):
@@ -251,11 +255,12 @@ class Fridge(db.Model):
 
     def to_dict(self):
         # @todo send resource to user url_for('api.get_user', uuid=user.uuid)
-        owners = [owner.displayname for owner in self.owners]
+        owners = [owner.to_dict(public_only=True) for owner in self.owners]
         data = {
             'id': self.uuid,
             'name': self.name,
-            'owner': owners
+            'owner': owners,
+            'creator': self.creator.to_dict(public_only=True)
         }
         return data
 

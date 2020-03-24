@@ -21,19 +21,29 @@ def check_user():
 
     return '', status_code
 
-@bp.route('/users', methods=['GET'])
-@jwt_required
-def get_user():
-    username = request.args.get('username', default = None, type = str)
-    email = request.args.get('email', default = None, type = str)
+# @bp.route('/users', methods=['GET'])
+# @jwt_required
+# def get_user():
+#     username = request.args.get('username', default = None, type = str)
+#     email = request.args.get('email', default = None, type = str)
+#
+#     user_query = User.query
+#     if username:
+#         user_query = user_query.filter_by(username=username)
+#     if email:
+#         user_query = user_query.filter_by(email=email)
+#     users = user_query.all()
+#     data = [user.to_dict() for user in users]
+#     return jsonify(data)
 
-    user_query = User.query
-    if username:
-        user_query = user_query.filter_by(username=username)
-    if email:
-        user_query = user_query.filter_by(email=email)
-    users = user_query.all()
-    data = [user.to_dict() for user in users]
+@bp.route('/users/email/<string:email>', methods=['GET'])
+@jwt_required
+def get_user_by_email(email):
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return error_response(404)
+
+    data = user.to_dict(public_only = True)
     return jsonify(data)
 
 @bp.route('/users', methods=['POST'])

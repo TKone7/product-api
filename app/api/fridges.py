@@ -32,6 +32,8 @@ def create_fridges():
     data = request.get_json() or {}
     fridge = Fridge()
     fridge.from_dict(data, is_new=True)
+    user = User.fromJwt()
+    fridge.creator = user
 
     db.session.add(fridge)
     db.session.commit()
@@ -55,6 +57,23 @@ def add_owners(fridge_uuid):
     fridge.owners.append(new_user)
     db.session.commit()
     return jsonify(fridge.to_dict()) if fridge else error_response(404)
+
+@bp.route('/fridges/<string:fridge_uuid>/owners/<string:user_uuid>', methods=['DELETE'])
+@jwt_required
+def delete_owners(fridge_uuid, user_uuid):
+    # get fridge reference and check permission (ownership)
+    fridge = getFridge(fridge_uuid)
+    if not fridge: return error_response(404)
+
+    if not userHasAccess(fridge):
+        return error_response(401)
+    if str(user_uuid) == str(fridge.creator.uuid):
+        abort(400, description='the creator cannot be deleted')
+
+    rem_user = User.query.filter_by(uuid=user_uuid).first()
+    fridge.owners.remove(rem_user)
+    db.session.commit()
+    return '', 204
 
 @bp.route('/fridges/<string:fridge_uuid>/items', methods=['GET'])
 @jwt_required
