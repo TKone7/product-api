@@ -42,6 +42,20 @@ def create_fridges():
     response.headers['Location'] = url_for('api.get_fridge_by_uuid', uuid=fridge.uuid)
     return response
 
+@bp.route('/fridges/<string:fridge_uuid>', methods=['DELETE'])
+@jwt_required
+def delete_fridge(fridge_uuid):
+    # get fridge reference and check permission (ownership)
+    fridge = getFridge(fridge_uuid)
+    if not fridge: return error_response(404)
+
+    if not userHasAccess(fridge):
+        return error_response(401)
+
+    db.session.delete(fridge)
+    db.session.commit()
+    return '', 204
+
 @bp.route('/fridges/<string:fridge_uuid>/owners', methods=['POST'])
 @jwt_required
 def add_owners(fridge_uuid):
@@ -165,7 +179,6 @@ def delete_item_from_fridge(fridge_uuid, item_uuid):
             return '', 204
 
     return error_response(404)
-
 
 def getFridge(uuid):
     fridge = Fridge.query.filter_by(uuid=uuid).first()

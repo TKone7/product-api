@@ -10,14 +10,19 @@ from sqlalchemy import desc, asc
 @bp.route('/products', methods=['GET'])
 # @jwt_required
 def get_products():
+    # sorting options
     sort_by = request.args.get('sort_by', default = 'name.asc', type = str)
     sort_column, sort_dir = sort_by.split('.')
     sort = asc(sort_column) if sort_dir == "asc" else desc(sort_column)
+
+    # filtering products
+    filter = request.args.get('query', default = None, type = str)
+
     # page = request.args.get('page',1, type=int)
     # per_page = min(request.args.get('per_page',50,type=int), 100)
     # data = Product.to_collection_dict(Product.query, page, per_page, 'api.get_products')
     products = Product.query.order_by(sort).all()
-    data = [item.to_dict() for item in products]
+    data = [item.to_dict() for item in products if (not filter or filter.lower() in (str(item.name) + ' ' + str(item.description)).strip().lower())]
     return jsonify(data)
 
 @bp.route('/products/<string:barcode>', methods=['GET'])
