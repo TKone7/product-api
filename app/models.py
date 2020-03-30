@@ -233,8 +233,15 @@ class Category(db.Model):
         }
         return data
 
-    def from_dict(self, data):
-        pass
+    def from_dict(self, data, is_new):
+        if is_new:
+            if ('name' not in data or 'slug' not in data) :
+                abort(400, description='name and slug are mandatory, receive ' + str(data))
+            self.name = data['name']
+            self.slug = data['slug']
+        else:
+            abort(400, description='update of an existing category is not yet implemented')
+
 
 class UserFridge(db.Model):
     __tablename__ = 'userfridge'

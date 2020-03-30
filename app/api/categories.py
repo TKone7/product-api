@@ -17,3 +17,18 @@ def get_categories():
 
     data = [item.to_dict() for item in query.all()]
     return jsonify(data)
+
+@bp.route('/categories', methods=['POST'])
+@jwt_required
+def add_category():
+    data = request.get_json() or {}
+
+    category = Category()
+    category.from_dict(data, is_new=True)
+
+    db.session.add(category)
+    db.session.commit()
+    response = jsonify(category.to_dict())
+    response.status_code = 201
+    # response.headers['Location'] = url_for('api.get_categories', barcode=product.barcode)
+    return response
