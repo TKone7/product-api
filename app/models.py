@@ -291,6 +291,7 @@ class Item(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
 
     qty = db.Column(db.Float(precision=2))
+    initQty = db.Column(db.Float(precision=2))
 
     def to_dict(self):
         # @todo send resource to fridge, product, url_for('api.***', uuid=user.uuid)
@@ -300,7 +301,8 @@ class Item(db.Model):
             'barcode': self.product.barcode,
             'created': self.created.strftime('%Y-%m-%d'),
             'expiry': self.expiry.strftime('%Y-%m-%d') if self.expiry else None,
-            'qty': self.qty
+            'qty': self.qty,
+            'initQty': self.initQty
         }
         return data
 
@@ -312,6 +314,7 @@ class Item(db.Model):
             if 'barcode' not in data or 'qty' not in data:
                 abort(400, description='product reference or qty is missing, receive ' + str(data))
             self.created = date.today()
+            self.initQty = data['qty']
             self.product = Product.query.filter_by(barcode=data['barcode']).first()
 
         if 'qty' in data:
