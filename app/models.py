@@ -144,7 +144,7 @@ class Product(PaginatedAPIMixin, db.Model):
             'creator': self.creator.username,
             'qty': self.qty,
             'imgurl': self.imgurl,
-            'category': self.category.slug if self.category else None
+            'category': self.category.to_dict() if self.category else None
         }
         nutrient_data = {
             'energy_kcal': self.energy_kcal,
