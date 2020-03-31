@@ -40,12 +40,14 @@ def get_product_by_barcode(barcode):
 @jwt_required
 def create_products():
     data = request.get_json() or {}
+    
     product = Product()
     product.from_dict(data, is_new=True)
 
     user = User.fromJwt()
     product.creator = user
 
+    print('product', product)
     db.session.add(product)
     db.session.commit()
     response = jsonify(product.to_dict())

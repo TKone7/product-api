@@ -118,8 +118,8 @@ class Product(PaginatedAPIMixin, db.Model):
 
     # relations
     items = db.relationship('Item', backref='product', lazy='dynamic')
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
     nutrientbase = db.Column(db.Enum(NutrientBase))
     energy_kcal = db.Column(db.Integer)
