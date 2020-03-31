@@ -40,7 +40,7 @@ def get_product_by_barcode(barcode):
 @jwt_required
 def create_products():
     data = request.get_json() or {}
-    
+
     product = Product()
     product.from_dict(data, is_new=True)
 
@@ -68,6 +68,8 @@ def update_products(barcode):
 @jwt_required
 def delete_products(barcode):
     product = Product.query.filter_by(barcode=barcode).first()
+    if len(product.items.all()) != 0:
+        return error_response(400, 'product has still linked items. Delete them first')
     db.session.delete(product)
     db.session.commit()
     return '', 204
