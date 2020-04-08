@@ -74,24 +74,22 @@ def delete_products(barcode):
     db.session.commit()
     return '', 204
 
-@bp.route('/dummy', methods=['GET'])
-def get_dummy():
+@bp.route('/dummy/<string:barcode>', methods=['GET'])
+def get_dummy(barcode):
+
+    product = Product.query.filter_by(barcode=barcode).first()
     data = {
-        'author': 'Tobias Koller',
+        'author': 'Fridgy',
         'imageUrl': 'https://goodfoodpittsburgh.com/wp-content/uploads/2020/04/90240620_2746770322276623_5907194348251886208_n-750x420.jpg',
-        "linkOutUrl": "https://www.myrecipe.com",
-        "name": "Hummus mit Rüebli",
+        "linkOutUrl": "https://fridgy-frontend.herokuapp.com/",
+        "name": "Product import from Fridgy",
         "tagline": "",
         "yield": "",
         "time": "",
-        "nutrition": {
-            "calories": "500 kcal"
-            },
+        "nutrition": { },
         "items": [
-            {"itemId": "Karotten", "spec": "2-3"},
-            {"itemId": "Sumach","spec": "1/4 TL","altIcon": "Rosmarin","altSection": "Früchte & Gemüse"},
-            {"itemId": "Salz","stock": True}
+            {"itemId": product.name}
         ]
         }
 
-    return jsonify(data)
+    return jsonify(data) if product else error_response(404)
