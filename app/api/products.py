@@ -74,10 +74,24 @@ def delete_products(barcode):
     db.session.commit()
     return '', 204
 
-# @bp.route('/dummy', methods=['GET'])
-# @jwt_required
-# def get_dummy():
-#     data = {
-#         'msg': 'You are authenticated and get some data. Your token expires in ' + str(get_raw_jwt()['exp'] - int(time.time())) + ' seconds'
-#     }
-#     return jsonify(data)
+@bp.route('/dummy', methods=['GET'])
+def get_dummy():
+    data = {
+        'author': 'Tobias Koller',
+        'imageUrl': 'https://goodfoodpittsburgh.com/wp-content/uploads/2020/04/90240620_2746770322276623_5907194348251886208_n-750x420.jpg',
+        "linkOutUrl": "https://www.myrecipe.com",
+        "name": "Hummus mit Rüebli",
+        "tagline": "",
+        "yield": "",
+        "time": "",
+        "nutrition": {
+            "calories": "500 kcal"
+            },
+        "items": [
+            {"itemId": "Karotten", "spec": "2-3"},
+            {"itemId": "Sumach","spec": "1/4 TL","altIcon": "Rosmarin","altSection": "Früchte & Gemüse"},
+            {"itemId": "Salz","stock": True}
+        ]
+        }
+
+    return jsonify(data)
