@@ -119,11 +119,11 @@
             "description" : "Product deleted.",
             "content" : { }
           },
-          "404" : {
-            "description" : "Product not found"
-          },
           "400" : {
             "description" : "Product has still linked items which must be deleted first."
+          },
+          "404" : {
+            "description" : "Product not found"
           }
         },
         "security" : [ {
@@ -202,6 +202,130 @@
             "description" : "all good"
           }
         }
+      },
+      "post" : {
+        "summary" : "Add a new fridge.",
+        "description" : "",
+        "operationId" : "create_fridges",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "fridges" ]
+      }
+    },
+    "/fridges/{uuid}" : {
+      "get" : {
+        "summary" : "Get fridge by UUID",
+        "description" : "",
+        "operationId" : "get_fridge_by_uuid",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "fridges" ]
+      },
+      "delete" : {
+        "summary" : "Delete existing fridge",
+        "description" : "",
+        "operationId" : "delete_fridge",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "fridges" ]
+      }
+    },
+    "/fridges/{uuid}/owners" : {
+      "summary" : "Members of a specific fridge",
+      "post" : {
+        "summary" : "Add users as owners to a fridge.",
+        "description" : "",
+        "operationId" : "add_owners",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "owners" ]
+      }
+    },
+    "/fridges/{uuid}/owners/{user_uuid}" : {
+      "summary" : "Member of a fridge's owners",
+      "delete" : {
+        "summary" : "Remove user from the owners of a fridge.",
+        "description" : "",
+        "operationId" : "delete_owners",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "owners" ]
+      }
+    },
+    "/fridges/{uuid}/items" : {
+      "summary" : "Represent the items in a fridge.",
+      "get" : {
+        "summary" : "Get all items in a specified fridge.",
+        "description" : "",
+        "operationId" : "get_fridge_items",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "items" ]
+      },
+      "post" : {
+        "summary" : "Adds a new item into the fridge.",
+        "description" : "",
+        "operationId" : "add_item_to_fridge",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "items" ]
+      }
+    },
+    "/fridges/{uuid}/items/{item_uuid}" : {
+      "summary" : "A specific item in a fridge.",
+      "get" : {
+        "summary" : "Get a specific item by it's UUID",
+        "description" : "",
+        "operationId" : "get_fridge_item",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "items" ]
+      },
+      "put" : {
+        "summary" : "Updates an existing item in a fridge identified by UUID",
+        "description" : "",
+        "operationId" : "update_fridge_item",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "items" ]
+      },
+      "delete" : {
+        "summary" : "Remove an item from the fridge.",
+        "description" : "",
+        "operationId" : "delete_item_from_fridge",
+        "responses" : {
+          "default" : {
+            "description" : "Default error sample response"
+          }
+        },
+        "tags" : [ "items" ]
       }
     }
   },
