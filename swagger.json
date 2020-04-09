@@ -20,7 +20,16 @@
   } ],
   "tags" : [ {
     "name" : "products",
-    "description" : "Represents a product"
+    "description" : "Represents a product."
+  }, {
+    "name" : "fridges",
+    "description" : "Represents a fridge."
+  }, {
+    "name" : "items",
+    "description" : "Represents an instance of a product in a fridge."
+  }, {
+    "name" : "owners",
+    "description" : "A user that is authorized to manage a fridge and its content."
   } ],
   "paths" : {
     "/products/{barcode}" : {
