@@ -1,0 +1,209 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "Fridgy",
+    "description" : "This is the API endpoint documentation from the Fridgy web app.",
+    "termsOfService" : "http://swagger.io/terms/",
+    "contact" : {
+      "email" : "hello@tobiaskoller.tk"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version" : "1.0.0"
+  },
+  "externalDocs" : {
+    "description" : "Find out more about Swagger",
+    "url" : "http://swagger.io"
+  },
+  "servers" : [ {
+    "url" : "https://fridgy-api.herokuapp.com/api"
+  }, {
+    "url" : "http://fridgy-api.herokuapp.com/api"
+  } ],
+  "tags" : [ {
+    "name" : "products",
+    "description" : "Represents a product"
+  } ],
+  "paths" : {
+    "/products/{barcode}" : {
+      "get" : {
+        "tags" : [ "products" ],
+        "summary" : "Find product by barcode",
+        "description" : "Searches the produts by the unique identifier of barcode.",
+        "operationId" : "get_product_by_barcode",
+        "parameters" : [ {
+          "name" : "barcode",
+          "in" : "path",
+          "description" : "Barcode used as unique identifier to find product",
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExtendedProduct"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Product not found"
+          }
+        }
+      }
+    },
+    "/products" : {
+      "get" : {
+        "tags" : [ "products" ],
+        "responses" : {
+          "200" : {
+            "description" : "all good"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "products" ],
+        "summary" : "Add a new product to the repository",
+        "operationId" : "create_products",
+        "requestBody" : {
+          "description" : "Product object that needs to be added to the repository",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostProduct"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "New product resource created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExtendedProduct"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "barcode is already existent",
+            "content" : { }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "x-codegen-request-body-name" : "body"
+      }
+    },
+    "/fridges" : {
+      "get" : {
+        "tags" : [ "fridges" ],
+        "responses" : {
+          "200" : {
+            "description" : "all good"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Product" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "barcode" : {
+            "type" : "string"
+          },
+          "qty" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qty_type" : {
+            "type" : "string",
+            "enum" : [ "gramm", "milliliter", "pieces" ]
+          },
+          "imgurl" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PostProduct" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/Product"
+        }, {
+          "required" : [ "category" ],
+          "type" : "object",
+          "properties" : {
+            "category" : {
+              "type" : "string"
+            }
+          }
+        } ]
+      },
+      "ExtendedProduct" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/Product"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "creator" : {
+              "type" : "string"
+            },
+            "category" : {
+              "$ref" : "#/components/schemas/Category"
+            }
+          }
+        } ]
+      },
+      "Category" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ApiResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "type" : {
+            "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}
