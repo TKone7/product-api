@@ -400,10 +400,20 @@
         "description" : "",
         "operationId" : "get_fridge_items",
         "responses" : {
-          "default" : {
-            "description" : "Default error sample response"
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ArrayOfItems"
+                }
+              }
+            }
           }
         },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
         "tags" : [ "items" ]
       },
       "post" : {
@@ -415,6 +425,9 @@
             "description" : "Default error sample response"
           }
         },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
         "tags" : [ "items" ]
       }
     },
@@ -446,6 +459,9 @@
             "description" : "Default error sample response"
           }
         },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
         "tags" : [ "items" ]
       },
       "put" : {
@@ -457,6 +473,9 @@
             "description" : "Default error sample response"
           }
         },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
         "tags" : [ "items" ]
       },
       "delete" : {
@@ -468,6 +487,9 @@
             "description" : "Default error sample response"
           }
         },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
         "tags" : [ "items" ]
       }
     }
@@ -619,6 +641,49 @@
           "displayname" : {
             "type" : "string"
           }
+        }
+      },
+      "Item" : {
+        "type" : "object",
+        "properties" : {
+          "barcode" : {
+            "type" : "string"
+          },
+          "expiry" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "qty" : {
+            "type" : "number",
+            "format" : "float"
+          }
+        }
+      },
+      "GetItem" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/Item"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "fridge" : {
+              "type" : "string",
+              "format" : "uuid"
+            },
+            "created" : {
+              "type" : "string",
+              "format" : "date"
+            },
+            "initQty" : {
+              "type" : "number",
+              "format" : "float"
+            }
+          }
+        } ]
+      },
+      "ArrayOfItems" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/GetItem"
         }
       },
       "Category" : {
