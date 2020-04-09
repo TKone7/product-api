@@ -137,6 +137,14 @@
         "summary" : "Get all products",
         "description" : "Returns an array of all products in the repository",
         "operationId" : "get_products",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "sort_by",
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The sorting of the result. e.g. name.asc, id.desc"
+        } ],
         "responses" : {
           "200" : {
             "description" : "successful operatoin",
