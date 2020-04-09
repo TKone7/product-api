@@ -24,8 +24,9 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.yaml
 
 *.bsdesign
 set_env
 node_modules
-latest.dump*
+*.dump*
