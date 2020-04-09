@@ -131,6 +131,13 @@
             "type" : "string"
           },
           "description" : "The sorting of the result. e.g. name.asc, id.desc"
+        }, {
+          "in" : "query",
+          "name" : "query",
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "Filter applied to the name and description of the products."
         } ],
         "responses" : {
           "200" : {
