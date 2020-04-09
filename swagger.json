@@ -373,6 +373,9 @@
           },
           "401" : {
             "description" : "Unauthorized to modify owners from this fridge."
+          },
+          "400" : {
+            "description" : "The creator of a fridge cannot be deleted"
           }
         },
         "security" : [ {
