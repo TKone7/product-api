@@ -191,6 +191,7 @@
     "/fridges" : {
       "get" : {
         "tags" : [ "fridges" ],
+        "operationId" : "get_fridges",
         "responses" : {
           "200" : {
             "description" : "successful operation",
