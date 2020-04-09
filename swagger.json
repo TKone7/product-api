@@ -37,7 +37,10 @@
           "name" : "barcode",
           "in" : "path",
           "description" : "Barcode used as unique identifier to find product",
-          "required" : true
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "responses" : {
           "200" : {
@@ -45,7 +48,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ExtendedProduct"
+                  "$ref" : "#/components/schemas/GetProduct"
                 }
               }
             }
@@ -54,14 +57,96 @@
             "description" : "Product not found"
           }
         }
+      },
+      "put" : {
+        "tags" : [ "products" ],
+        "summary" : "Update an existing product",
+        "operationId" : "update_products",
+        "parameters" : [ {
+          "name" : "barcode",
+          "in" : "path",
+          "description" : "Barcode used as unique identifier to find product",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "Product object that needs to be updated",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostProduct"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Product updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetProduct"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Product not found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "products" ],
+        "summary" : "Delete an existing product",
+        "operationId" : "delete_products",
+        "parameters" : [ {
+          "name" : "barcode",
+          "in" : "path",
+          "description" : "Barcode used as unique identifier to find product",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Product deleted.",
+            "content" : { }
+          },
+          "404" : {
+            "description" : "Product not found"
+          },
+          "400" : {
+            "description" : "Product has still linked items which must be deleted first."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
       }
     },
     "/products" : {
       "get" : {
         "tags" : [ "products" ],
+        "summary" : "Get all products",
+        "description" : "Returns an array of all products in the repository",
+        "operationId" : "get_products",
         "responses" : {
           "200" : {
-            "description" : "all good"
+            "description" : "successful operatoin",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ArrayOfProducts"
+                }
+              }
+            }
           }
         }
       },
@@ -86,7 +171,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ExtendedProduct"
+                  "$ref" : "#/components/schemas/GetProduct"
                 }
               }
             }
@@ -98,8 +183,7 @@
         },
         "security" : [ {
           "bearerAuth" : [ ]
-        } ],
-        "x-codegen-request-body-name" : "body"
+        } ]
       }
     },
     "/fridges" : {
@@ -137,6 +221,46 @@
           },
           "imgurl" : {
             "type" : "string"
+          },
+          "nutrient" : {
+            "type" : "object",
+            "properties" : {
+              "carbs" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "carbs_sugar" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "energy_kcal" : {
+                "type" : "integer"
+              },
+              "fat" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "fat_saturated" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "fiber" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "protein" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "salt" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "nutrientbase" : {
+                "type" : "string",
+                "enum" : [ "hundred_gramm", "hundred_milliliter" ]
+              }
+            }
           }
         }
       },
@@ -153,14 +277,15 @@
           }
         } ]
       },
-      "ExtendedProduct" : {
+      "GetProduct" : {
         "allOf" : [ {
           "$ref" : "#/components/schemas/Product"
         }, {
           "type" : "object",
           "properties" : {
             "id" : {
-              "type" : "string"
+              "type" : "string",
+              "format" : "uuid"
             },
             "creator" : {
               "type" : "string"
@@ -170,6 +295,12 @@
             }
           }
         } ]
+      },
+      "ArrayOfProducts" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/GetProduct"
+        }
       },
       "Category" : {
         "type" : "object",
