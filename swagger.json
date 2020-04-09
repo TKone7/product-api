@@ -420,9 +420,36 @@
         "summary" : "Adds a new item into the fridge.",
         "description" : "",
         "operationId" : "add_item_to_fridge",
+        "requestBody" : {
+          "description" : "New item that should be created.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Item"
+              }
+            }
+          },
+          "required" : true
+        },
         "responses" : {
-          "default" : {
-            "description" : "Default error sample response"
+          "201" : {
+            "description" : "New item added to the fridge",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetItem"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "product reference or qty is missing"
+          },
+          "404" : {
+            "description" : "Fridge not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
           }
         },
         "security" : [ {
@@ -455,8 +482,21 @@
         "description" : "",
         "operationId" : "get_fridge_item",
         "responses" : {
-          "default" : {
-            "description" : "Default error sample response"
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetItem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Fridge or Item not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
           }
         },
         "security" : [ {
@@ -468,9 +508,42 @@
         "summary" : "Updates an existing item in a fridge identified by UUID",
         "description" : "",
         "operationId" : "update_fridge_item",
+        "requestBody" : {
+          "description" : "Updated item.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "expiry" : {
+                    "type" : "string",
+                    "format" : "date"
+                  },
+                  "qty" : {
+                    "type" : "number",
+                    "format" : "float"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses" : {
-          "default" : {
-            "description" : "Default error sample response"
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetItem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Fridge or Item not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
           }
         },
         "security" : [ {
@@ -483,8 +556,15 @@
         "description" : "",
         "operationId" : "delete_item_from_fridge",
         "responses" : {
-          "default" : {
-            "description" : "Default error sample response"
+          "204" : {
+            "description" : "Item deleted",
+            "content" : { }
+          },
+          "404" : {
+            "description" : "Fridge or Item not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
           }
         },
         "security" : [ {
@@ -644,6 +724,7 @@
         }
       },
       "Item" : {
+        "required" : [ "barcode", "qty" ],
         "type" : "object",
         "properties" : {
           "barcode" : {
@@ -676,6 +757,10 @@
             "initQty" : {
               "type" : "number",
               "format" : "float"
+            },
+            "id" : {
+              "type" : "string",
+              "format" : "uuid"
             }
           }
         } ]
