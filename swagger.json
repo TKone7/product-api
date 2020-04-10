@@ -53,7 +53,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GetProduct"
+                  "$ref" : "#/components/schemas/Product"
                 }
               }
             }
@@ -72,7 +72,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/PostProduct"
+                "$ref" : "#/components/schemas/CreateProduct"
               }
             }
           },
@@ -84,7 +84,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GetProduct"
+                  "$ref" : "#/components/schemas/Product"
                 }
               }
             }
@@ -161,7 +161,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/PostProduct"
+                "$ref" : "#/components/schemas/CreateProduct"
               }
             }
           },
@@ -173,7 +173,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GetProduct"
+                  "$ref" : "#/components/schemas/Product"
                 }
               }
             }
@@ -217,7 +217,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/Fridge"
+                "$ref" : "#/components/schemas/BaseFridge"
               }
             }
           },
@@ -229,7 +229,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GetFridge"
+                  "$ref" : "#/components/schemas/Fridge"
                 }
               }
             }
@@ -261,7 +261,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GetFridge"
+                  "$ref" : "#/components/schemas/Fridge"
                 }
               }
             }
@@ -338,7 +338,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GetFridge"
+                  "$ref" : "#/components/schemas/Fridge"
                 }
               }
             }
@@ -438,7 +438,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/Item"
+                "$ref" : "#/components/schemas/BaseItem"
               }
             }
           },
@@ -450,7 +450,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GetItem"
+                  "$ref" : "#/components/schemas/Item"
                 }
               }
             }
@@ -500,7 +500,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GetItem"
+                  "$ref" : "#/components/schemas/Item"
                 }
               }
             }
@@ -547,7 +547,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/GetItem"
+                  "$ref" : "#/components/schemas/Item"
                 }
               }
             }
@@ -589,7 +589,7 @@
   },
   "components" : {
     "schemas" : {
-      "Product" : {
+      "BaseProduct" : {
         "type" : "object",
         "properties" : {
           "name" : {
@@ -654,9 +654,9 @@
           }
         }
       },
-      "PostProduct" : {
+      "CreateProduct" : {
         "allOf" : [ {
-          "$ref" : "#/components/schemas/Product"
+          "$ref" : "#/components/schemas/BaseProduct"
         }, {
           "required" : [ "category" ],
           "type" : "object",
@@ -667,9 +667,9 @@
           }
         } ]
       },
-      "GetProduct" : {
+      "Product" : {
         "allOf" : [ {
-          "$ref" : "#/components/schemas/Product"
+          "$ref" : "#/components/schemas/BaseProduct"
         }, {
           "type" : "object",
           "properties" : {
@@ -689,10 +689,10 @@
       "ArrayOfProducts" : {
         "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/GetProduct"
+          "$ref" : "#/components/schemas/Product"
         }
       },
-      "Fridge" : {
+      "BaseFridge" : {
         "type" : "object",
         "properties" : {
           "name" : {
@@ -700,9 +700,9 @@
           }
         }
       },
-      "GetFridge" : {
+      "Fridge" : {
         "allOf" : [ {
-          "$ref" : "#/components/schemas/Fridge"
+          "$ref" : "#/components/schemas/BaseFridge"
         }, {
           "type" : "object",
           "properties" : {
@@ -721,7 +721,7 @@
       "ArrayOfFridges" : {
         "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/GetFridge"
+          "$ref" : "#/components/schemas/Fridge"
         }
       },
       "GetUser" : {
@@ -736,7 +736,7 @@
           }
         }
       },
-      "Item" : {
+      "BaseItem" : {
         "required" : [ "barcode", "qty" ],
         "type" : "object",
         "properties" : {
@@ -753,9 +753,9 @@
           }
         }
       },
-      "GetItem" : {
+      "Item" : {
         "allOf" : [ {
-          "$ref" : "#/components/schemas/Item"
+          "$ref" : "#/components/schemas/BaseItem"
         }, {
           "type" : "object",
           "properties" : {
@@ -781,7 +781,7 @@
       "ArrayOfItems" : {
         "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/GetItem"
+          "$ref" : "#/components/schemas/Item"
         }
       },
       "Category" : {
