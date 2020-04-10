@@ -1,0 +1,822 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "Fridgy",
+    "description" : "This is the API endpoint documentation from the Fridgy web app.",
+    "termsOfService" : "http://swagger.io/terms/",
+    "contact" : {
+      "email" : "hello@tobiaskoller.tk"
+    },
+    "version" : "1.0.0"
+  },
+  "externalDocs" : {
+    "description" : "Find out more about Swagger",
+    "url" : "http://swagger.io"
+  },
+  "servers" : [ {
+    "url" : "https://fridgy-api.herokuapp.com/api"
+  }, {
+    "url" : "http://fridgy-api.herokuapp.com/api"
+  } ],
+  "tags" : [ {
+    "name" : "products",
+    "description" : "Represents a product."
+  }, {
+    "name" : "fridges",
+    "description" : "Represents a fridge."
+  }, {
+    "name" : "items",
+    "description" : "Represents an instance of a product in a fridge."
+  }, {
+    "name" : "owners",
+    "description" : "A user that is authorized to manage a fridge and its content."
+  } ],
+  "paths" : {
+    "/products/{barcode}" : {
+      "parameters" : [ {
+        "name" : "barcode",
+        "in" : "path",
+        "description" : "Barcode used as unique identifier to find product",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ],
+      "get" : {
+        "tags" : [ "products" ],
+        "summary" : "Find product by barcode",
+        "description" : "Searches the produts by the unique identifier of barcode.",
+        "operationId" : "get_product_by_barcode",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetProduct"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Product not found"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "products" ],
+        "summary" : "Update an existing product",
+        "operationId" : "update_products",
+        "requestBody" : {
+          "description" : "Product object that needs to be updated",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostProduct"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Product updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetProduct"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Product not found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "products" ],
+        "summary" : "Delete an existing product",
+        "operationId" : "delete_products",
+        "responses" : {
+          "204" : {
+            "description" : "Product deleted.",
+            "content" : { }
+          },
+          "400" : {
+            "description" : "Product has still linked items which must be deleted first."
+          },
+          "404" : {
+            "description" : "Product not found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/products" : {
+      "get" : {
+        "tags" : [ "products" ],
+        "summary" : "Get all products",
+        "description" : "Returns an array of all products in the repository",
+        "operationId" : "get_products",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "sort_by",
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "The sorting of the result. e.g. name.asc, id.desc"
+        }, {
+          "in" : "query",
+          "name" : "query",
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "Filter applied to the name and description of the products."
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ArrayOfProducts"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "products" ],
+        "summary" : "Add a new product to the repository",
+        "operationId" : "create_products",
+        "requestBody" : {
+          "description" : "Product object that needs to be added to the repository",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostProduct"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "New product resource created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetProduct"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "barcode is already existent",
+            "content" : { }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/fridges" : {
+      "get" : {
+        "tags" : [ "fridges" ],
+        "operationId" : "get_fridges",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ArrayOfFridges"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "post" : {
+        "summary" : "Add a new fridge.",
+        "description" : "",
+        "operationId" : "create_fridges",
+        "requestBody" : {
+          "description" : "Fridge that needs to be created",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Fridge"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "New fridge resource created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetFridge"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "fridges" ]
+      }
+    },
+    "/fridges/{uuid}" : {
+      "parameters" : [ {
+        "name" : "uuid",
+        "in" : "path",
+        "description" : "UUID to identify a fridge",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ],
+      "get" : {
+        "summary" : "Get fridge by UUID",
+        "description" : "",
+        "operationId" : "get_fridge_by_uuid",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetFridge"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Fridge not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "fridges" ]
+      },
+      "delete" : {
+        "summary" : "Delete existing fridge",
+        "description" : "",
+        "operationId" : "delete_fridge",
+        "responses" : {
+          "204" : {
+            "description" : "Fridge deleted.",
+            "content" : { }
+          },
+          "404" : {
+            "description" : "Fridge not found"
+          },
+          "401" : {
+            "description" : "Unauthorized to delete the fridge."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "fridges" ]
+      }
+    },
+    "/fridges/{uuid}/owners" : {
+      "parameters" : [ {
+        "name" : "uuid",
+        "in" : "path",
+        "description" : "UUID to identify a fridge",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ],
+      "summary" : "Members of a specific fridge",
+      "post" : {
+        "summary" : "Add users as owners to a fridge.",
+        "description" : "",
+        "operationId" : "add_owners",
+        "requestBody" : {
+          "description" : "UUID of user that should be added as owner",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "uuid" : {
+                    "type" : "string",
+                    "format" : "uuid"
+                  }
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "User added as owner",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetFridge"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Fridge not found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "owners" ]
+      }
+    },
+    "/fridges/{uuid}/owners/{user_uuid}" : {
+      "parameters" : [ {
+        "name" : "uuid",
+        "in" : "path",
+        "description" : "UUID to identify a fridge",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      }, {
+        "name" : "user_uuid",
+        "in" : "path",
+        "description" : "UUID of user",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ],
+      "summary" : "Member of a fridge's owners",
+      "delete" : {
+        "summary" : "Remove user from the owners of a fridge.",
+        "description" : "",
+        "operationId" : "delete_owners",
+        "responses" : {
+          "204" : {
+            "description" : "User removed from owners.",
+            "content" : { }
+          },
+          "404" : {
+            "description" : "Fridge not found"
+          },
+          "401" : {
+            "description" : "Unauthorized to modify owners from this fridge."
+          },
+          "400" : {
+            "description" : "The creator of a fridge cannot be deleted"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "owners" ]
+      }
+    },
+    "/fridges/{uuid}/items" : {
+      "parameters" : [ {
+        "name" : "uuid",
+        "in" : "path",
+        "description" : "UUID to identify a fridge",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ],
+      "summary" : "Represent the items in a fridge.",
+      "get" : {
+        "summary" : "Get all items in a specified fridge.",
+        "description" : "",
+        "operationId" : "get_fridge_items",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ArrayOfItems"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "items" ]
+      },
+      "post" : {
+        "summary" : "Adds a new item into the fridge.",
+        "description" : "",
+        "operationId" : "add_item_to_fridge",
+        "requestBody" : {
+          "description" : "New item that should be created.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Item"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "New item added to the fridge",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetItem"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "product reference or qty is missing"
+          },
+          "404" : {
+            "description" : "Fridge not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "items" ]
+      }
+    },
+    "/fridges/{uuid}/items/{item_uuid}" : {
+      "parameters" : [ {
+        "name" : "uuid",
+        "in" : "path",
+        "description" : "UUID to identify a fridge",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      }, {
+        "name" : "item_uuid",
+        "in" : "path",
+        "description" : "UUID of item",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ],
+      "summary" : "A specific item in a fridge.",
+      "get" : {
+        "summary" : "Get a specific item by it's UUID",
+        "description" : "",
+        "operationId" : "get_fridge_item",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetItem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Fridge or Item not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "items" ]
+      },
+      "put" : {
+        "summary" : "Updates an existing item in a fridge identified by UUID",
+        "description" : "",
+        "operationId" : "update_fridge_item",
+        "requestBody" : {
+          "description" : "Updated item.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "expiry" : {
+                    "type" : "string",
+                    "format" : "date"
+                  },
+                  "qty" : {
+                    "type" : "number",
+                    "format" : "float"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetItem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Fridge or Item not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "items" ]
+      },
+      "delete" : {
+        "summary" : "Remove an item from the fridge.",
+        "description" : "",
+        "operationId" : "delete_item_from_fridge",
+        "responses" : {
+          "204" : {
+            "description" : "Item deleted",
+            "content" : { }
+          },
+          "404" : {
+            "description" : "Fridge or Item not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "items" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Product" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "barcode" : {
+            "type" : "string"
+          },
+          "qty" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qty_type" : {
+            "type" : "string",
+            "enum" : [ "gramm", "milliliter", "pieces" ]
+          },
+          "imgurl" : {
+            "type" : "string"
+          },
+          "nutrient" : {
+            "type" : "object",
+            "properties" : {
+              "carbs" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "carbs_sugar" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "energy_kcal" : {
+                "type" : "integer"
+              },
+              "fat" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "fat_saturated" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "fiber" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "protein" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "salt" : {
+                "type" : "number",
+                "format" : "float"
+              },
+              "nutrientbase" : {
+                "type" : "string",
+                "enum" : [ "hundred_gramm", "hundred_milliliter" ]
+              }
+            }
+          }
+        }
+      },
+      "PostProduct" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/Product"
+        }, {
+          "required" : [ "category" ],
+          "type" : "object",
+          "properties" : {
+            "category" : {
+              "type" : "string"
+            }
+          }
+        } ]
+      },
+      "GetProduct" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/Product"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string",
+              "format" : "uuid"
+            },
+            "creator" : {
+              "type" : "string"
+            },
+            "category" : {
+              "$ref" : "#/components/schemas/Category"
+            }
+          }
+        } ]
+      },
+      "ArrayOfProducts" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/GetProduct"
+        }
+      },
+      "Fridge" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "GetFridge" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/Fridge"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "owner" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/GetUser"
+              }
+            },
+            "creator" : {
+              "$ref" : "#/components/schemas/GetUser"
+            }
+          }
+        } ]
+      },
+      "ArrayOfFridges" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/GetFridge"
+        }
+      },
+      "GetUser" : {
+        "type" : "object",
+        "properties" : {
+          "uuid" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "displayname" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Item" : {
+        "required" : [ "barcode", "qty" ],
+        "type" : "object",
+        "properties" : {
+          "barcode" : {
+            "type" : "string"
+          },
+          "expiry" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "qty" : {
+            "type" : "number",
+            "format" : "float"
+          }
+        }
+      },
+      "GetItem" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/Item"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "fridge" : {
+              "type" : "string",
+              "format" : "uuid"
+            },
+            "created" : {
+              "type" : "string",
+              "format" : "date"
+            },
+            "initQty" : {
+              "type" : "number",
+              "format" : "float"
+            },
+            "id" : {
+              "type" : "string",
+              "format" : "uuid"
+            }
+          }
+        } ]
+      },
+      "ArrayOfItems" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/GetItem"
+        }
+      },
+      "Category" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ApiResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "type" : {
+            "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}
