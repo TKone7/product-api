@@ -709,11 +709,11 @@
             "owner" : {
               "type" : "array",
               "items" : {
-                "$ref" : "#/components/schemas/GetUser"
+                "$ref" : "#/components/schemas/PublicUser"
               }
             },
             "creator" : {
-              "$ref" : "#/components/schemas/GetUser"
+              "$ref" : "#/components/schemas/PublicUser"
             }
           }
         } ]
@@ -724,7 +724,7 @@
           "$ref" : "#/components/schemas/Fridge"
         }
       },
-      "GetUser" : {
+      "PublicUser" : {
         "type" : "object",
         "properties" : {
           "uuid" : {
