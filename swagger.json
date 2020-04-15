@@ -618,6 +618,36 @@
           }
         },
         "tags" : [ "users" ]
+      },
+      "get" : {
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "username",
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "Filters a for a username"
+        }, {
+          "in" : "query",
+          "name" : "email",
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "Filters a for an email"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Users existing the filters",
+            "content" : { }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "tags" : [ "users" ]
       }
     }
   },
