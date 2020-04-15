@@ -30,6 +30,9 @@
   }, {
     "name" : "owners",
     "description" : "A user that is authorized to manage a fridge and its content."
+  }, {
+    "name" : "users",
+    "description" : "Used for registration."
   } ],
   "paths" : {
     "/products/{barcode}" : {
@@ -584,6 +587,37 @@
           "bearerAuth" : [ ]
         } ],
         "tags" : [ "items" ]
+      }
+    },
+    "/users" : {
+      "summary" : "Members of a specific fridge",
+      "head" : {
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "username",
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "Filters a for a username"
+        }, {
+          "in" : "query",
+          "name" : "email",
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "Filters a for an email"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No users found",
+            "content" : { }
+          },
+          "200" : {
+            "description" : "Users existing the filters",
+            "content" : { }
+          }
+        },
+        "tags" : [ "users" ]
       }
     }
   },
